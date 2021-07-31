@@ -27,4 +27,17 @@ After reading the Wiki article on CFGs, I felt comfortable with the concept - ev
 I studied the 1st figure on the CFG wiki article to make sure I understood it, and wasn't surprised :)
 
 Now, let's check something that bothers me - is there a "print" functionality to networkx
+There is! good.
+
+## The algorithm!
+
+What am I aiming for? An algorithm that will make me a graph in O(n) time.
+After a quick discussion with my dad (a very experienced programmer), I figured it's quite simple - 
+
+You iterate the list of instructions, and start defining a block.
+A block is defined by the start index (the first opcode) and the end index (the last opcode of the block).
+During iteration, a block will be defined with a start index, but it's end index is defined and changed when
+
+1) there is a JUMP opcode from inside the block
+2) there is a JUMP opcode into the middle of the block
 

@@ -102,10 +102,47 @@ You can use any library for basic graph functions - e.g. networkx. Don't forget 
 
 import networkx as nx
 from utils.log_util import make_logger
+from collections import defaultdict
 
 Opcode = Union[Expression, Assignment, Jump, Call]
 
 
+@dataclass
+class Block:
+    start: int
+    end: int
+
+
+def find_block_start(b: Block):
+    """
+
+    :param b: A block to find the start of
+    :return:
+    """
+    pass
+
+
 def build_cfg(variables: List[Var], instructions: List[Opcode]):
-    log = make_logger(stdout=True, filepath="cfg_construction.log")
-    log.info('New run!')
+    pass
+    # log = make_logger(stdout=True, filepath="cfg_construction.log")
+    # log.info('New run!')
+
+    jumps = defaultdict(list)
+    blocks = {}  # Just a sorted dict of the start:end
+
+    for i, ins in enumerate(instructions):
+        # If it is a Jump opcode, add to jumps
+        if isinstance(ins, Jump):
+            jumps[ins.target].append(i)
+            blocks[ins.target] = None
+            # if contidional - there is an additional jump to the next index
+            if ins.condition is None:
+                jumps[i+1].append(i)
+                blocks[i+1] = None
+
+    dests = sorted(list(jumps.keys()))
+    srcs = sorted(list(jumps.values()))
+    blocks[0] = min(dests[0], srcs[0])
+    # Iterate jumps, every time a jump
+    for i in range(1, len(dests)):
+        blocks[dests[i]] = 
