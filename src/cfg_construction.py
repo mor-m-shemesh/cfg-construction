@@ -102,16 +102,17 @@ You can use any library for basic graph functions - e.g. networkx. Don't forget 
 
 import networkx as nx
 from utils.log_util import make_logger
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+from sortedcontainers import SortedSet
 
 Opcode = Union[Expression, Assignment, Jump, Call]
 
 
 @dataclass
 class Block:
-    start: int
-    end: int
-    jumps: list
+    start: Optional[int]
+    end: Optional[int]
+    jump_targets: Optional[list]
 
 
 def find_block_start(b: Block):
@@ -129,21 +130,37 @@ def build_cfg(variables: List[Var], instructions: List[Opcode]):
     # log.info('New run!')
 
     jumps = defaultdict(list)
-    blocks = {}  # Just a sorted dict of the start:end
+    blocks = dict({0: Block(start=0, end=-1, jump_targets=list())})  # Just a sorted dict of the start:end
+    block_starts = SortedSet([0])
 
+    curr_block = blocks[0]
+    last_jump_skipped = False
     for i, ins in enumerate(instructions):
-        # If it is a Jump opcode, add to jumps
-        if isinstance(ins, Jump):
-            jumps[ins.target].append(i)
-            blocks[ins.target] = None
-            # if contidional - there is an additional jump to the next index
-            if ins.condition is None:
-                jumps[i+1].append(i)
-                blocks[i+1] = None
+        # Create new block if I am jumped to, or someone jumped ahead of me
+        if i in jumps or last_jump_skipped:
+            last_jump_skipped = False
+            curr_block = Block(start=i, end=-1, jump_targets=list())
+            blocks[i] = curr_block
+            block_starts.add(i)
 
-    dests = sorted(list(jumps.keys()))
-    srcs = sorted(list(jumps.values()))
-    blocks[0] = min(dests[0], srcs[0])
-    # Iterate jumps, every time a jump
-    for i in range(1, len(dests)):
-        blocks[dests[i]] =
+        if isinstance(ins, Jump) and ins.target != i + 1:
+            curr_block.end = i
+
+            if ins.target > i:
+                jumps[ins.target].append(i)
+                curr_block.jump_targets.append(ins.target)
+            else:  # we need to split a previous block (or the current one)
+                block_to_split = blocks[block_starts.bisect_left(ins.target)]
+                new_block = Block(start=ins.target, end=block_to_split.end, jump_targets=block_to_split.jump_targets)
+                block_to_split.end = ins.target - 1
+                block_to_split.jump_targets = list(ins.target)
+                blocks[ins.target] = new_block
+
+            if ins.condition:
+                curr_block.jump_targets.append(i + 1)
+                jumps[i + 1].append(i)
+            else:
+                last_jump_skipped = True
+
+
+
