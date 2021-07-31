@@ -51,3 +51,8 @@ I'll need to keep track of the following:
 After I started writing a naïve and spaghetti-prone implementation, I rethought about it and started from scratch.
 
 My writer's block ended and I finished implementing a simple algorithm with not much fancy frameworking (graphics, tests... still a WIP). took about... 3 hours from start to finish?
+
+### catastrophe!
+
+going over my code briefly, I noticed something bad - When splitting an old block, I set the curr_block no matter how far above me the block being split  is...
+A quick fix - check if we are on the end of the new block created in the split! Worked like a charm!

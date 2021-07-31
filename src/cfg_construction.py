@@ -76,6 +76,18 @@ code = [
     Call("print", [output])  # 6
 ]
 
+code2 = [
+    Assignment(base, 2),  # 0
+    Assignment(counter, 5),  # 1
+    Assignment(output, 1),  # 2
+    # Loop start
+    Assignment(output, Expression(output, base, Operation.MUL)),  # 3
+    Assignment(counter, Expression(counter, 1, Operation.SUB)),  # 4
+    Jump(7, None),  # 5
+    Jump(3, counter),  # 6
+    Call("print", [output])  # 7
+]
+
 """
 Now, we want to build a control flow graph from this function.
 Our nodes will be instructions, and our edges will contain conditions. For example, the code:
@@ -154,7 +166,8 @@ def build_cfg(variables: List[Var], instructions: List[Opcode]):
                 blocks[ins.target] = new_block
                 log.debug(f"Split block: {block_to_split}")
                 log.debug(f"New block: {new_block}")
-                curr_block = new_block
+                if new_block.end == i:
+                    curr_block = new_block
 
             # if conditional jump - add the default continue ahead jump.
             if ins.condition:
@@ -169,7 +182,7 @@ def build_cfg(variables: List[Var], instructions: List[Opcode]):
 
 
 def main():
-    build_cfg(None, code)
+    build_cfg(None, code2)
 
 
 if __name__ == "__main__":
