@@ -111,6 +111,7 @@ Opcode = Union[Expression, Assignment, Jump, Call]
 class Block:
     start: int
     end: int
+    jumps: list
 
 
 def find_block_start(b: Block):
@@ -145,4 +146,4 @@ def build_cfg(variables: List[Var], instructions: List[Opcode]):
     blocks[0] = min(dests[0], srcs[0])
     # Iterate jumps, every time a jump
     for i in range(1, len(dests)):
-        blocks[dests[i]] = 
+        blocks[dests[i]] =
