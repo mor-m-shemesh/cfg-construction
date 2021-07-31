@@ -32,7 +32,7 @@ There is! good.
 ## The algorithm!
 
 What am I aiming for? An algorithm that will make me a graph in O(n) time.
-After a quick discussion with my dad (a very experienced programmer), I figured it's quite simple - 
+After a quick discussion with my dad (a very experienced programmer), that we had last weekend, I figured it's quite simple - 
 
 You iterate the list of instructions, and start defining a block.
 A block is defined by the start index (the first opcode) and the end index (the last opcode of the block).
@@ -41,3 +41,13 @@ During iteration, a block will be defined with a start index, but it's end index
 1) there is a JUMP opcode from inside the block
 2) there is a JUMP opcode into the middle of the block
 
+I'll need to keep track of the following:
+
+1. All the JUMP opcodes, and where they lead, sorted by destination, IF AND ONLY IF they jump forward. the sorted dict is as such:
+   { dest_address : [source addresses] }
+2. All of the blocks, that I create as a dict 
+3. all the starts of blocks, sorted in an AVL. I looked for and found a nice implementation that gives you a bisect function, using 'sortedcontainers' - SortedSet.
+
+After I started writing a naïve and spaghetti-prone implementation, I rethought about it and started from scratch.
+
+My writer's block ended and I finished implementing a simple algorithm with not much fancy frameworking (graphics, tests... still a WIP). took about... 3 hours from start to finish?
