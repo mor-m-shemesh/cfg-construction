@@ -108,3 +108,4 @@ Opcode = Union[Expression, Assignment, Jump, Call]
 
 def build_cfg(variables: List[Var], instructions: List[Opcode]):
     log = make_logger(stdout=True, filepath="cfg_construction.log")
+    log.info('New run!')
